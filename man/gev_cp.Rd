@@ -13,12 +13,9 @@ qgev_cp(
   x,
   p = seq(0.1, 0.9, 0.1),
   ics = c(0, 0, 0),
-  d1 = 0.01,
-  fd2 = 0.01,
-  d3 = 0.01,
   fdalpha = 0.01,
   minxi = -1,
-  maxxi = 999,
+  maxxi = 1,
   means = FALSE,
   waicscores = FALSE,
   extramodels = FALSE,
@@ -28,68 +25,51 @@ qgev_cp(
   rust = FALSE,
   nrust = 1e+05,
   pwm = FALSE,
-  debug = FALSE,
-  aderivs = TRUE
+  debug = FALSE
 )
 
 rgev_cp(
   n,
   x,
   ics = c(0, 0, 0),
-  d1 = 0.01,
-  fd2 = 0.01,
-  d3 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
+  method = "rust",
   extramodels = FALSE,
   rust = FALSE,
   mlcp = TRUE,
-  debug = FALSE,
-  aderivs = TRUE
+  debug = FALSE
 )
 
 dgev_cp(
   x,
   y = x,
   ics = c(0, 0, 0),
-  d1 = 0.01,
-  fd2 = 0.01,
-  d3 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   extramodels = FALSE,
   rust = FALSE,
   nrust = 1000,
-  debug = FALSE,
-  aderivs = TRUE
+  boot = FALSE,
+  nboot = 1000,
+  debug = FALSE
 )
 
 pgev_cp(
   x,
   y = x,
   ics = c(0, 0, 0),
-  d1 = 0.01,
-  fd2 = 0.01,
-  d3 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   extramodels = FALSE,
   rust = FALSE,
   nrust = 1000,
-  debug = FALSE,
-  aderivs = TRUE
-)
-
-tgev_cp(
-  n,
-  x,
-  ics = c(0, 0, 0),
-  d1 = 0.01,
-  fd2 = 0.01,
-  d3 = 0.01,
-  extramodels = FALSE,
+  boot = FALSE,
+  nboot = 1000,
   debug = FALSE
 )
+
+tgev_cp(method, n, x, ics = c(0, 0, 0), extramodels = FALSE, debug = FALSE)
 }
 \arguments{
 \item{x}{a vector of training data values}
@@ -97,15 +77,6 @@ tgev_cp(
 \item{p}{a vector of probabilities at which to generate predictive quantiles}
 
 \item{ics}{initial conditions for the maximum likelihood search}
-
-\item{d1}{if \code{aderivs=FALSE}, the delta used for numerical derivatives
-with respect to the first parameter}
-
-\item{fd2}{if \code{aderivs=FALSE}, the fractional delta used for numerical derivatives
-with respect to the second parameter}
-
-\item{d3}{if \code{aderivs=FALSE}, the delta used for numerical derivatives
-with respect to the third parameter}
 
 \item{fdalpha}{if \code{pdf=TRUE}, the fractional delta used for numerical derivatives
 with respect to probability, for calculating the pdf as a function of quantiles}
@@ -142,17 +113,21 @@ sampling calculations should be run or not (longer run time)}
 
 \item{debug}{logical for turning on debug messages}
 
-\item{aderivs}{(for code testing only) logical for whether to use
-analytic derivatives (instead of numerical). By default almost all models now
-use analytical derivatives.}
-
 \item{n}{the number of random samples required}
+
+\item{method}{character string that indicates whether to use
+rust \code{method=rust} or bootstrap \code{method=boot}}
 
 \item{mlcp}{logical that indicates whether maxlik and parameter
 uncertainty calculations should be performed (turn off to speed up RUST)}
 
 \item{y}{a vector of values at which to calculate the density and
 distribution functions}
+
+\item{boot}{logical that indicates whether bootstrap-based posterior
+sampling calculations should be run or not (longer run time)}
+
+\item{nboot}{the number of posterior samples used in the bootstrap calculations}
 }
 \value{
 \code{q****} returns a list containing at least the following:
@@ -353,7 +328,7 @@ equation is not possible.
 \section{Optional Return Values (some EVT models only)}{
 
 
-{q****} optionally returns the following, for some EVT models only:
+\code{q****} optionally returns the following, for some EVT models only:
 
 If \code{extramodels=TRUE}:
 \itemize{
@@ -414,7 +389,7 @@ and so there is no right Haar prior and no method
 for generating exactly reliable predictions.
 The \code{cp} outputs are generated using a prior that has been shown
 in tests to give reasonable reliability.
-See Jewson et al. (2024) for discussion of the prior and test results.
+See Jewson et al. (2025a) for discussion of the prior and test results.
 For non-homogeneous models, reliability is generally poor for small sample sizes (<20),
 but is still much better than maximum likelihood.
 For small sample sizes, it is advisable to check the level of reliability
@@ -474,7 +449,7 @@ If you use this package, we would be grateful if you would cite the following re
 which gives the various calibrating priors, and tests them for reliability:
 
 \itemize{
-\item Jewson S., Sweeting T. and Jewson L. (2024): Reducing Reliability Bias in
+\item Jewson S., Sweeting T. and Jewson L. (2025): Reducing Reliability Bias in
 Assessments of Extreme Weather Risk using Calibrating Priors;
 ASCMO Advances in Statistical Climatology, Meteorology and Oceanography),
 \url{https://ascmo.copernicus.org/articles/11/1/2025/}.
@@ -482,7 +457,7 @@ ASCMO Advances in Statistical Climatology, Meteorology and Oceanography),
 }
 \seealso{
 An introduction to \code{fitdistcp}, with more examples,
-is given \href{http://www.fitdistcp.info/index.html}{on this webpage}.
+is given \href{https://www.fitdistcp.info/index.html}{on this webpage}.
 
 The \code{fitdistcp} package currently includes the following models (in alphabetical order):
 \itemize{
@@ -497,6 +472,7 @@ The \code{fitdistcp} package currently includes the following models (in alphabe
 \item Generalized normal (\code{gnorm}),
 \item GEV (\code{gev}),
 \item GEV with linear predictor on the location (\code{gev_p1}),
+\item GEV with 1-3 linear predictors on the location (\code{gev_p1n}),
 \item GEV with linear predictor on the location and log-linear prediction on the scale
 (\code{gev_p12}),
 \item GEV with linear predictor on the location, log-linear prediction on the scale,
@@ -517,7 +493,8 @@ and known DoF (\code{lst_p1k3}),
 \item Log-normal (\code{lnorm}),
 \item Log-normal with linear predictor on the location (\code{lnorm_p1}),
 \item Normal (\code{norm}),
-\item Normal with linear predictor on the mean (\code{norm_p1}),
+\item Normal with predictor on the mean (\code{norm_p1}),
+\item Normal with predictors on the mean and sd (\code{norm_p12}),
 \item Pareto with known scale (\code{pareto_k2}),
 \item Pareto with log-linear predictor on the shape and known scale (\code{pareto_p1k2}),
 \item Uniform (\code{unif}),

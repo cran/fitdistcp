@@ -7,7 +7,7 @@
 \alias{dgev_p1_cp}
 \alias{pgev_p1_cp}
 \alias{tgev_p1_cp}
-\title{Generalized Extreme Value Distribution with a Predictor, Predictions Based on a Calibrating Prior}
+\title{Generalized Extreme Value Distribution with a Single Predictor on the Location, Predictions Based on a Calibrating Prior}
 \usage{
 qgev_p1_cp(
   x,
@@ -16,13 +16,9 @@ qgev_p1_cp(
   n0 = NA,
   p = seq(0.1, 0.9, 0.1),
   ics = c(0, 0, 0, 0),
-  d1 = 0.01,
-  d2 = 0.01,
-  fd3 = 0.01,
-  d4 = 0.01,
   fdalpha = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   means = FALSE,
   waicscores = FALSE,
   extramodels = FALSE,
@@ -32,8 +28,7 @@ qgev_p1_cp(
   nrust = 1e+05,
   predictordata = TRUE,
   centering = TRUE,
-  debug = FALSE,
-  aderivs = TRUE
+  debug = FALSE
 )
 
 rgev_p1_cp(
@@ -43,17 +38,12 @@ rgev_p1_cp(
   t0 = NA,
   n0 = NA,
   ics = c(0, 0, 0, 0),
-  d1 = 0.01,
-  d2 = 0.01,
-  fd3 = 0.01,
-  d4 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   extramodels = FALSE,
   rust = FALSE,
   mlcp = TRUE,
-  debug = FALSE,
-  aderivs = TRUE
+  debug = FALSE
 )
 
 dgev_p1_cp(
@@ -63,18 +53,13 @@ dgev_p1_cp(
   n0 = NA,
   y = x,
   ics = c(0, 0, 0, 0),
-  d1 = 0.01,
-  d2 = 0.01,
-  fd3 = 0.01,
-  d4 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   extramodels = FALSE,
   rust = FALSE,
   nrust = 1000,
   centering = TRUE,
-  debug = FALSE,
-  aderivs = TRUE
+  debug = FALSE
 )
 
 pgev_p1_cp(
@@ -84,32 +69,16 @@ pgev_p1_cp(
   n0 = NA,
   y = x,
   ics = c(0, 0, 0, 0),
-  d1 = 0.01,
-  d2 = 0.01,
-  fd3 = 0.01,
-  d4 = 0.01,
-  minxi = -0.45,
-  maxxi = 0.45,
+  minxi = -1,
+  maxxi = 1,
   extramodels = FALSE,
   rust = FALSE,
   nrust = 1000,
   centering = TRUE,
-  debug = FALSE,
-  aderivs = TRUE
-)
-
-tgev_p1_cp(
-  n,
-  x,
-  t,
-  ics = c(0, 0, 0, 0),
-  d1 = 0.01,
-  d2 = 0.01,
-  fd3 = 0.01,
-  d4 = 0.01,
-  extramodels = FALSE,
   debug = FALSE
 )
+
+tgev_p1_cp(n, x, t, ics = c(0, 0, 0, 0), extramodels = FALSE, debug = FALSE)
 }
 \arguments{
 \item{x}{a vector of training data values}
@@ -125,18 +94,6 @@ tgev_p1_cp(
 \item{p}{a vector of probabilities at which to generate predictive quantiles}
 
 \item{ics}{initial conditions for the maximum likelihood search}
-
-\item{d1}{if \code{aderivs=FALSE}, the delta used for numerical derivatives
-with respect to the first parameter}
-
-\item{d2}{if \code{aderivs=FALSE}, the delta used for numerical derivatives
-with respect to the second parameter}
-
-\item{fd3}{if \code{aderivs=FALSE}, the fractional delta used for numerical derivatives
-with respect to the third parameter}
-
-\item{d4}{if \code{aderivs=FALSE}, the delta used for numerical derivatives
-with respect to the fourth parameter}
 
 \item{fdalpha}{if \code{pdf=TRUE}, the fractional delta used for numerical derivatives
 with respect to probability, for calculating the pdf as a function of quantiles}
@@ -171,10 +128,6 @@ sampling calculations should be run or not (longer run time)}
 \item{centering}{logical that indicates whether the predictor should be centered}
 
 \item{debug}{logical for turning on debug messages}
-
-\item{aderivs}{(for code testing only) logical for whether to use
-analytic derivatives (instead of numerical). By default almost all models now
-use analytical derivatives.}
 
 \item{n}{the number of random samples required}
 
@@ -294,10 +247,11 @@ The calibrating prior we use is given by
 \deqn{\pi(a,b,\sigma,\xi) \propto \frac{1}{\sigma}}
 as given in Jewson et al. (2025).
 
-The code will stop with an error if the
+The code will switch to maximum likelihood prediction if the
 input data gives a maximum likelihood
 value for the shape parameter that lies outside the range \code{(minxi,maxxi)},
 since outside this range there may be numerical problems.
+If this happens, it is reported in the \code{revert2ml} flag.
 Such values seldom occur
 in real observed data for maxima.
 }
@@ -385,7 +339,7 @@ equation is not possible.
 \section{Optional Return Values (some EVT models only)}{
 
 
-{q****} optionally returns the following, for some EVT models only:
+\code{q****} optionally returns the following, for some EVT models only:
 
 If \code{extramodels=TRUE}:
 \itemize{
@@ -446,7 +400,7 @@ and so there is no right Haar prior and no method
 for generating exactly reliable predictions.
 The \code{cp} outputs are generated using a prior that has been shown
 in tests to give reasonable reliability.
-See Jewson et al. (2024) for discussion of the prior and test results.
+See Jewson et al. (2025a) for discussion of the prior and test results.
 For non-homogeneous models, reliability is generally poor for small sample sizes (<20),
 but is still much better than maximum likelihood.
 For small sample sizes, it is advisable to check the level of reliability
@@ -506,7 +460,7 @@ If you use this package, we would be grateful if you would cite the following re
 which gives the various calibrating priors, and tests them for reliability:
 
 \itemize{
-\item Jewson S., Sweeting T. and Jewson L. (2024): Reducing Reliability Bias in
+\item Jewson S., Sweeting T. and Jewson L. (2025): Reducing Reliability Bias in
 Assessments of Extreme Weather Risk using Calibrating Priors;
 ASCMO Advances in Statistical Climatology, Meteorology and Oceanography),
 \url{https://ascmo.copernicus.org/articles/11/1/2025/}.
@@ -514,7 +468,7 @@ ASCMO Advances in Statistical Climatology, Meteorology and Oceanography),
 }
 \seealso{
 An introduction to \code{fitdistcp}, with more examples,
-is given \href{http://www.fitdistcp.info/index.html}{on this webpage}.
+is given \href{https://www.fitdistcp.info/index.html}{on this webpage}.
 
 The \code{fitdistcp} package currently includes the following models (in alphabetical order):
 \itemize{
@@ -529,6 +483,7 @@ The \code{fitdistcp} package currently includes the following models (in alphabe
 \item Generalized normal (\code{gnorm}),
 \item GEV (\code{gev}),
 \item GEV with linear predictor on the location (\code{gev_p1}),
+\item GEV with 1-3 linear predictors on the location (\code{gev_p1n}),
 \item GEV with linear predictor on the location and log-linear prediction on the scale
 (\code{gev_p12}),
 \item GEV with linear predictor on the location, log-linear prediction on the scale,
@@ -549,7 +504,8 @@ and known DoF (\code{lst_p1k3}),
 \item Log-normal (\code{lnorm}),
 \item Log-normal with linear predictor on the location (\code{lnorm_p1}),
 \item Normal (\code{norm}),
-\item Normal with linear predictor on the mean (\code{norm_p1}),
+\item Normal with predictor on the mean (\code{norm_p1}),
+\item Normal with predictors on the mean and sd (\code{norm_p12}),
 \item Pareto with known scale (\code{pareto_k2}),
 \item Pareto with log-linear predictor on the shape and known scale (\code{pareto_p1k2}),
 \item Uniform (\code{unif}),

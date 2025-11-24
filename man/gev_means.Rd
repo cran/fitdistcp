@@ -9,13 +9,8 @@ gev_means(
   means,
   ml_params,
   lddi,
-  lddi_k3,
   lddd,
-  lddd_k3,
-  lambdad_flat,
-  lambdad_rh_mle,
   lambdad_rh_flat,
-  lambdad_jp,
   lambdad_custom,
   nx,
   dim = 3
@@ -28,19 +23,9 @@ gev_means(
 
 \item{lddi}{inverse observed information matrix}
 
-\item{lddi_k3}{inverse observed information matrix, fixed shape parameter}
-
 \item{lddd}{third derivative of log-likelihood}
 
-\item{lddd_k3}{third derivative of log-likelihood, fixed shape parameter}
-
-\item{lambdad_flat}{derivative of the log flat prior}
-
-\item{lambdad_rh_mle}{derivative of the log CRHP-MLE prior}
-
 \item{lambdad_rh_flat}{derivative of the log CRHP-FLAT prior}
-
-\item{lambdad_jp}{derivative of the log JP prior}
 
 \item{lambdad_custom}{custom value of the derivative of the log prior}
 
